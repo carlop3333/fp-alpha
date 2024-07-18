@@ -1,0 +1,13 @@
+body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+}
+.hud {
+    z-index: 1;
+    position: absolute;
+    margin: 0.4cm;
+}
+canvas {
+    z-index: 0;
+}
