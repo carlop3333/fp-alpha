@@ -1,31 +1,132 @@
 import "./styles.css";
-import Stats from "stats.js";
+import Konva from "konva";
+import { allyDown, canvasReset, placePixel, makeClouds, wheel, isSpray, allyUp } from "./helpers";
+import { setupStats } from "./utils";
+import { colorPicker } from "./picker";
+import { updateDropdown } from "./dropdown";
 
-//start stats first
-const stats = new Stats();
-stats.showPanel(0);
-stats.dom.style.right = "0px";
-stats.dom.style.removeProperty("left");
-document.body.appendChild(stats.dom);
+//* writables go here
+let isDropOpen = false;
 
-//get canvas
-const canvas = document.querySelector("canvas");
-//canvas init (resize)
-canvas!.width = window.innerWidth;
-canvas!.height = window.innerHeight; 
+
+//* start stats first
+const stats = setupStats(document);
+
+//* setup color picker
+const picker = new colorPicker(
+  document.getElementById("color-block") as HTMLCanvasElement,
+  document.getElementById("color-input") as HTMLInputElement,
+  document.getElementById("color-label") as HTMLLabelElement
+);
+picker.setup();
+
+//then setup dropdown
+const dropbutton = document.getElementById("dropdown") as HTMLButtonElement;
+const dropcontent = document.getElementById("ddwn-content") as HTMLDivElement;
+dropbutton.addEventListener("click", () => {
+  if (isDropOpen) {
+    dropcontent.style.display = "none";
+    isDropOpen = false;
+  } else {
+    dropcontent.style.display = "block";
+    isDropOpen = true;
+  }
+});
+
+//*get canvas
+const canvas = document.querySelector<HTMLDivElement>("#canvas");
 //apply legacy background
-canvas!.style.transition = 'background-color 0.2s cubic-bezier(0.33, 1, 0.68, 1)';
-const ctx = canvas!.getContext("2d");
-if (ctx) {
-    console.debug("Canvas init!");
-    canvas!.style.backgroundColor = "#3d3d3d";
-}
+canvas!.style.transition = "background-color 0.2s cubic-bezier(0.33, 1, 0.68, 1)";
+canvas!.style.backgroundColor = "rgb(100, 205, 238)";
+
+//* start canvas
+const main = new Konva.Stage({
+  container: canvas!,
+  width: window.innerWidth,
+  height: window.innerHeight,
+  draggable: true,
+});
+const mainLayer = new Konva.Layer({ listening: false, id: "main" });
+const backgroundLayer = new Konva.Layer();
+//window center
+const centerX = window.innerWidth / 2;
+const centerY = window.innerHeight / 2;
+
+main.add(mainLayer).add(backgroundLayer);
+//pixel background
+mainLayer.add(
+  //1+ w/h as a fix
+  new Konva.Rect({
+    width: 513,
+    height: 513,
+    fill: "#CECECE",
+    x: 0,
+    y: 0,
+    shadowColor: "#000",
+    shadowBlur: 5,
+    shadowOpacity: 0.5,
+    shadowOffset: { x: -10, y: 20 },
+  })
+);
+main.position({ x: centerX - 256, y: centerY - 256 });
+
+//clouds in da background
+makeClouds(backgroundLayer);
+
+//* start server connection
+const serverInstance = new Worker(new URL("./server.ts", import.meta.url), { type: "module" });
+serverInstance.onmessage = (ev) => {
+    
+};
+
+//Event listeners
+main.on("wheel", (e) => wheel(e, main));
+window.addEventListener("resize", canvasReset);
+window.addEventListener("keydown", (e) => allyDown(e, main));
+window.addEventListener("keyup", (e) => allyUp(e, main));
+
+main.on("click", () => {
+  if (!isSpray()) placePixel(main)
+});
+
+var fillId: NodeJS.Timeout | undefined;
+main.on("mouseup mousedown", ({type}) => {
+  if (isSpray() && type == "mousedown") {
+    fillId = setInterval(() => {
+        placePixel(main);   
+    }, 50);
+  }
+  if (type == "mouseup") clearInterval(fillId);
+})
+
+
+const abcol = document.getElementById("abcol") as HTMLSpanElement;
+
+main.on("pointermove", (ev) => {
+  if (isDropOpen) {
+    updateDropdown(dropcontent, ev.evt, ev.target as Konva.Stage);
+  } 
+  const absolPos = main.getRelativePointerPosition()!;
+  //TODO: Fix manual limit (get limit from server)
+  if (absolPos.x > 0 && absolPos.x < 512 && absolPos.y > 0 && absolPos.y < 512) {
+    abcol.textContent = `(${absolPos.x.toFixed()},${absolPos.y.toFixed()})`;
+  }
+});
 
 function mainLoop() {
-    stats.begin();
+  stats.begin();
 
-    stats.end();
-    requestAnimationFrame(mainLoop);
+  mainLayer.draw();
+
+  stats.end();
+  requestAnimationFrame(mainLoop);
+}
+//not going to export main and picker fuck that
+export function getStage() {
+  return main;
+}
+export function getColor() {
+  return picker.color;
 }
 
 requestAnimationFrame(mainLoop);

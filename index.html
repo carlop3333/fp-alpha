@@ -1,17 +1,55 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="public/favicon.jpg" />
+    <link rel="icon" href="/favicon.jpg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script type="module" src="/src/main.ts"></script>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@40,400,0,0" />
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@40,400,0,0"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=PT+Sans+Narrow:wght@400;700&display=swap"
+    />
     <title>ForeverPlaced</title>
   </head>
   <body>
+    <!-- HUD -->
     <div class="hud">
+      <!-- note at top -->
+      <div id="alphanote">
+        <h2 class="title">
+          Welcome to ForeverPlaced! (alpha) Check out the
+          <a href="https://discord.gg/fN4pG4AN4F" rel="noreferrer noopener" target="_blank">discord</a>!
+        </h2>
+      </div>
+      <!-- dropdown -->
       <button type="button" id="dropdown"><span class="material-symbols-outlined">menu</span></button>
+      <div id="ddwn-content">
+        <h2>Debug details:</h2>
+        <p>mouse coords: <h3 id="mcoords"></h3> </p>
+				<p>canvas coords: <h3 id="ccoords"></h3> </p>
+				<p>scale: <h3 id="scalecc"></h3> </p>
+				<h2>Pixel coordinates (click a pixel)</h2>
+				<p>pixel coords: <h3 id="pcoords"></h3> </p>
+				<p>pixelId: <h3 id="pid"></h3> </p>
+				<p>pixelColor: <h3 id="pcol"></h3> </p>
+      </div>
+      <!-- notifications system -->
+      <!-- coordinates -->
+      <span id="abcol">(?,?)</span>
+      <!-- color picker -->
+       <label for="color-input" id="color-label"></label>
+       <div id="color-picker">
+         <canvas id="color-block" height="150" width="160"></canvas>
+         <input type="text" title="Pixel hex color" placeholder="Pixel hex color" id="color-input" maxlength="7">
+       </div>
     </div>
-    <canvas></canvas>   
+    <!-- HUD END -->
+    <div id="canvas">
   </body>
 </html>
