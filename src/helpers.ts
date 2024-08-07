@@ -69,20 +69,24 @@ export function placePixel(arg1: number | Konva.Stage, arg2?: number, arg3?: str
     getServerWorker().postMessage({type: "pixel", data: {color, x, y}})
   }
 
-  function pix(layer: Konva.Layer, x: number, y: number, color: string) {
+  function pix(layer: Konva.Layer, x: number, y: number, color: string): boolean {
     /* console.debug(`trying to place on: ${x}, ${y}`); */
     const pixel = layer.findOne(`.${x}_${y}`);
     if (pixel !== undefined) {
       /* console.debug(`found pixel on: ${x}, ${y}`);  */
-      if (pixel.getAttr("fill") == color) return;
+      if (pixel.getAttr("fill") == color) return false;
       pixel.setAttr("fill", color);
+      layer.cache({pixelRatio: 4});
+      return true;
     } else {
       /* console.debug(`creating pixel on: ${x}, ${y}`);  */
       layer.add(
         new Konva.Rect({ width: 1, height: 1, fill: color, x: x, y: y, name: `${x}_${y}` })
       );
+      layer.cache({pixelRatio: 4});
+      return true;
     }
-    layer.cache({pixelRatio: 4});
+    
   }
 
   if (typeof arg1 === "number" && typeof arg2 === "number") {
@@ -108,8 +112,8 @@ export function placePixel(arg1: number | Konva.Stage, arg2?: number, arg3?: str
     const pointerPos = stage.getRelativePointerPosition()!;
     //TODO: Again, Fix manual limit (get limit from server)
     if (pointerPos.x > 0 && pointerPos.x < 512 && pointerPos.y > 0 && pointerPos.y < 512) {
-      pix(layer, Math.floor(pointerPos.x), Math.floor(pointerPos.y), color);
-      callToServ(Math.floor(pointerPos.x), Math.floor(pointerPos.y), color);
+      const b = pix(layer, Math.floor(pointerPos.x), Math.floor(pointerPos.y), color);
+      if (b) callToServ(Math.floor(pointerPos.x), Math.floor(pointerPos.y), color);
     }
   }
 }
