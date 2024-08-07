@@ -87,7 +87,7 @@ makeClouds(backgroundLayer);
 //get initial batch
 fetch("https://backend.foreverplaced.net/initialbatch").then((res) => {
   res.json().then((data) => {
-    console.log("Downloaded initial pixel batch.")
+    console.log("Downloaded initial pixel batch.");
     const pixels = new Array<Konva.Rect>();
     for (const pixel of data) {
       const px = mainLayer.findOne(`.${pixel.x}_${pixel.y}`);

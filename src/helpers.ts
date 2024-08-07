@@ -76,13 +76,11 @@ export function placePixel(arg1: number | Konva.Stage, arg2?: number, arg3?: str
       /* console.debug(`found pixel on: ${x}, ${y}`);  */
       if (pixel.getAttr("fill") == color) return;
       pixel.setAttr("fill", color);
-      callToServ(x, y, color);
     } else {
       /* console.debug(`creating pixel on: ${x}, ${y}`);  */
       layer.add(
         new Konva.Rect({ width: 1, height: 1, fill: color, x: x, y: y, name: `${x}_${y}` })
       );
-      callToServ(x, y, color);
     }
     layer.cache({pixelRatio: 4});
   }
@@ -111,6 +109,7 @@ export function placePixel(arg1: number | Konva.Stage, arg2?: number, arg3?: str
     //TODO: Again, Fix manual limit (get limit from server)
     if (pointerPos.x > 0 && pointerPos.x < 512 && pointerPos.y > 0 && pointerPos.y < 512) {
       pix(layer, Math.floor(pointerPos.x), Math.floor(pointerPos.y), color);
+      callToServ(Math.floor(pointerPos.x), Math.floor(pointerPos.y), color);
     }
   }
 }

@@ -26,8 +26,8 @@ server.onmessage = (ev) => {
           const chunkX = d[2];
           const chunkY = d[3];
           // (pixel.data.y <= 0xFF) ? pixel.data.x : pixel.data.x * chunkSize - (chunkSize * 2);
-          const x = chunkX == 0 ? d[4] : d[4] * chunkSize;
-          const y = chunkY == 0 ? d[5] : d[5] * chunkSize;
+          const x = chunkX == 0 ? d[4] : d[4] + chunkSize;
+          const y = chunkY == 0 ? d[5] : d[5] + chunkSize;
           const color = "#" + bufferToHexStr(d.slice(6));
           postMessage({ type: "pixel", data: { x, y, color } });
           break;
@@ -54,8 +54,8 @@ onmessage = (ev) => {
       const chunkSize = 0xff;
       const chunkX = pixel.data.x <= 0xff ? 0x0 : 0x1;
       const chunkY = pixel.data.y <= 0xff ? 0x0 : 0x1;
-      const x = pixel.data.y <= 0xff ? pixel.data.x : pixel.data.x * chunkSize - chunkSize * 2;
-      const y = pixel.data.y <= 0xff ? pixel.data.y : pixel.data.y * chunkSize - chunkSize * 2;
+      const x = pixel.data.y >= 0xff ? pixel.data.x + chunkSize - (chunkSize * 2) : pixel.data.x;
+      const y = pixel.data.y >= 0xff ? pixel.data.y + chunkSize - (chunkSize * 2) : pixel.data.y;
       const color = hexStrTo8(pixel.data.color.replace("#", ""));
       server.send(new Uint8Array([0x1, chunkX, chunkY, x, y, ...color]));
       break;
