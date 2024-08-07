@@ -70,15 +70,15 @@ export function placePixel(arg1: number | Konva.Stage, arg2?: number, arg3?: str
   }
 
   function pix(layer: Konva.Layer, x: number, y: number, color: string) {
-    console.debug(`trying to place on: ${x}, ${y}`);
+    /* console.debug(`trying to place on: ${x}, ${y}`); */
     const pixel = layer.findOne(`.${x}_${y}`);
     if (pixel !== undefined) {
-      console.debug(`found pixel on: ${x}, ${y}`); 
+      /* console.debug(`found pixel on: ${x}, ${y}`);  */
       if (pixel.getAttr("fill") == color) return;
       pixel.setAttr("fill", color);
       callToServ(x, y, color);
     } else {
-      console.debug(`creating pixel on: ${x}, ${y}`); 
+      /* console.debug(`creating pixel on: ${x}, ${y}`);  */
       layer.add(
         new Konva.Rect({ width: 1, height: 1, fill: color, x: x, y: y, name: `${x}_${y}` })
       );
