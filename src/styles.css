@@ -13,7 +13,7 @@ h3 {
 }
 
 /* Title Sans*/
-.title {
+.fpfont {
   font-family: "PT Sans Narrow", sans-serif;
   font-weight: 700;
   font-style: normal;
@@ -62,6 +62,20 @@ h3 {
   border: black solid 0.4px;
 }
 
+#pcount {
+  position: fixed;
+  bottom: 0px;
+  right: 9.3cm;
+  margin: 0.4cm;
+  width: 60px;
+  height: 30px;
+  text-align: center;
+  align-content: center;
+  background-color: seashell;
+  border-radius: 4px;
+  border: black solid 0.4px;
+}
+
 
 #color-picker {
   right: 0px;
@@ -78,6 +92,7 @@ h3 {
 
 #color-input {
   height: 32px;
+  width: 150px;
   margin: 0.2cm;
 }
 
@@ -116,4 +131,21 @@ h3 {
 #canvas {
   position: relative;
   z-index: 0;
+}
+
+.mso-edit {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: normal;
+  vertical-align: bottom;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: 'liga';
+  -moz-osx-font-smoothing: grayscale;
 }

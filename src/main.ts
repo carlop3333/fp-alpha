@@ -1,13 +1,24 @@
 import "./styles.css";
 import Konva from "konva";
-import { allyDown, canvasReset, placePixel, makeClouds, wheel, isSpray, allyUp } from "./helpers";
-import { setupStats } from "./utils";
+import {
+  allyDown,
+  canvasReset,
+  placePixel,
+  makeClouds,
+  wheel,
+  isSpray,
+  allyUp,
+  genericData,
+  playerCount,
+  pixelPlace,
+  pixelBatch,
+} from "./helpers";
+import { createSymbol, setupStats } from "./utils";
 import { colorPicker } from "./picker";
 import { updateDropdown } from "./dropdown";
 
 //* writables go here
 let isDropOpen = false;
-
 
 //* start stats first
 const stats = setupStats(document);
@@ -57,8 +68,8 @@ main.add(mainLayer).add(backgroundLayer);
 mainLayer.add(
   //1+ w/h as a fix
   new Konva.Rect({
-    width: 513,
-    height: 513,
+    width: 510,
+    height: 510,
     fill: "#CECECE",
     x: 0,
     y: 0,
@@ -73,10 +84,49 @@ main.position({ x: centerX - 256, y: centerY - 256 });
 //clouds in da background
 makeClouds(backgroundLayer);
 
+//get initial batch
+fetch("https://backend.foreverplaced.net/initialbatch").then((res) => {
+  res.json().then((data) => {
+    console.log("DATA!!")
+    const pixels = new Array<Konva.Rect>();
+    for (const pixel of data) {
+      const px = mainLayer.findOne(`.${pixel.x}_${pixel.y}`);
+      if (px !== undefined) {
+        if (px.getAttr("fill") == `#${pixel.color}`) return;
+        px.setAttr("fill", `#${pixel.color}`);
+      } else {
+        pixels.push(
+          new Konva.Rect({
+            width: 1,
+            height: 1,
+            fill: `#${pixel.color}`,
+            x: parseInt(pixel.x),
+            y: parseInt(pixel.y),
+            name: `${pixel.x}_${pixel.y}`,
+          })
+        );
+      }
+    }
+    mainLayer.add(...pixels);
+    mainLayer.cache({ pixelRatio: 4 });
+  });
+});
+
 //* start server connection
 const serverInstance = new Worker(new URL("./server.ts", import.meta.url), { type: "module" });
+const pCount = document.getElementById("pcount") as HTMLSpanElement;
 serverInstance.onmessage = (ev) => {
-    
+  const msg = ev.data as genericData;
+  switch (msg.type) {
+    case "playerCount":
+      pCount.innerHTML = ""; //cleans it
+      pCount.append(createSymbol("group"), (msg as playerCount).data.count.toString());
+      break;
+    case "pixel":
+      const pix = (msg as pixelPlace).data;
+      placePixel(pix.x, pix.y, pix.color);
+      break;
+  }
 };
 
 //Event listeners
@@ -86,30 +136,29 @@ window.addEventListener("keydown", (e) => allyDown(e, main));
 window.addEventListener("keyup", (e) => allyUp(e, main));
 
 main.on("click", () => {
-  if (!isSpray()) placePixel(main)
+  if (!isSpray()) placePixel(main);
 });
 
 var fillId: NodeJS.Timeout | undefined;
-main.on("mouseup mousedown", ({type}) => {
+main.on("mouseup mousedown", ({ type }) => {
   if (isSpray() && type == "mousedown") {
     fillId = setInterval(() => {
-        placePixel(main);   
+      placePixel(main);
     }, 50);
   }
   if (type == "mouseup") clearInterval(fillId);
-})
-
+});
 
 const abcol = document.getElementById("abcol") as HTMLSpanElement;
 
 main.on("pointermove", (ev) => {
   if (isDropOpen) {
     updateDropdown(dropcontent, ev.evt, ev.target as Konva.Stage);
-  } 
+  }
   const absolPos = main.getRelativePointerPosition()!;
   //TODO: Fix manual limit (get limit from server)
-  if (absolPos.x > 0 && absolPos.x < 512 && absolPos.y > 0 && absolPos.y < 512) {
-    abcol.textContent = `(${absolPos.x.toFixed()},${absolPos.y.toFixed()})`;
+  if (absolPos.x > 0 && absolPos.x <= 510 && absolPos.y > 0 && absolPos.y <= 510) {
+    abcol.textContent = `(${Math.floor(absolPos.x).toFixed()},${Math.floor(absolPos.y).toFixed()})`;
   }
 });
 
@@ -127,6 +176,9 @@ export function getStage() {
 }
 export function getColor() {
   return picker.color;
+}
+export function getServerWorker() {
+  return serverInstance;
 }
 
 requestAnimationFrame(mainLoop);

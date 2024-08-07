@@ -15,9 +15,22 @@ export function setupStats(document: Document) {
     return stats;
 }
 
-export function componentToHex(c: number) {
+export function componentToHex(c: number): string {
     var hex = c.toString(16);
     return hex.length == 1 ? "0" + hex : hex;
+}
+
+/**
+ * @description A string hex to UInt8. Note that assumes # is not in the text
+ */
+export function hexStrTo8(s: string): Uint8Array {
+  const b = new Array<number>;
+  for (const part of s.trim().match(/.{2}/g)!) {
+    const n = parseInt(part, 16);
+    if (isNaN(n)) throw new EvalError("malformed hex code");
+    b.push(n);
+  }
+  return new Uint8Array(b);
 }
 
 export async function loadTextures(urls: Array<string>): Promise<HTMLImageElement[]>  {
@@ -34,4 +47,23 @@ export async function loadTextures(urls: Array<string>): Promise<HTMLImageElemen
       }
       res(imgs);
     })
+}
+
+export function createSymbol(symbolName: string): HTMLSpanElement {
+  const symbol = document.createElement("span");
+  symbol.className = "mso-edit";
+  symbol.textContent = symbolName;
+  return symbol;
+}
+
+export function bufferToHexStr(b: Uint8Array): string {
+  let s = "";
+  if (b.length == 3) {
+    for (const part of b) {
+      s += componentToHex(part);
+    }
+    return s;
+  } else {
+    throw new EvalError("malformed hex code!");
+  }
 }

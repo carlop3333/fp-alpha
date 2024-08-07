@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" href="/favicon.jpg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="A canvas, a color picker? A place that goes forever. That's ForeverPlaced. Join with friends, do factions, and go to events!" />
     <script type="module" src="/src/main.ts"></script>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -22,7 +23,7 @@
     <div class="hud">
       <!-- note at top -->
       <div id="alphanote">
-        <h2 class="title">
+        <h2 class="fpfont">
           Welcome to ForeverPlaced! (alpha) Check out the
           <a href="https://discord.gg/fN4pG4AN4F" rel="noreferrer noopener" target="_blank">discord</a>!
         </h2>
@@ -30,18 +31,26 @@
       <!-- dropdown -->
       <button type="button" id="dropdown"><span class="material-symbols-outlined">menu</span></button>
       <div id="ddwn-content">
+        <h2 class="fpfont" style="text-align: center;">Menu</h2>
+        <div>
+          <button type="button">Factions menu (soon!)</button>
+          <br />
+          <button type="button">User area (soon!)</button>
+          <br />
+          <button type="button">Other worlds (soon!)</button>
+          <br />
+          <button type="button">Changelog (soon!)</button>
+        </div>
         <h2>Debug details:</h2>
         <p>mouse coords: <h3 id="mcoords"></h3> </p>
 				<p>canvas coords: <h3 id="ccoords"></h3> </p>
 				<p>scale: <h3 id="scalecc"></h3> </p>
-				<h2>Pixel coordinates (click a pixel)</h2>
-				<p>pixel coords: <h3 id="pcoords"></h3> </p>
-				<p>pixelId: <h3 id="pid"></h3> </p>
-				<p>pixelColor: <h3 id="pcol"></h3> </p>
+        <button type="button">Test captcha</button>
       </div>
       <!-- notifications system -->
       <!-- coordinates -->
-      <span id="abcol">(?,?)</span>
+      <span id="pcount" class="fpfont" title="Online players"><span class="mso-edit">group</span>  ?</span>
+      <span id="abcol" class="fpfont" title="Coordinates">(?,?)</span>
       <!-- color picker -->
        <label for="color-input" id="color-label"></label>
        <div id="color-picker">

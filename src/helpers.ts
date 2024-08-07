@@ -1,6 +1,6 @@
 import { KonvaEventObject } from "konva/lib/Node";
 import { checkForScale, loadTextures } from "./utils";
-import { getColor, getStage } from "./main";
+import { getColor, getServerWorker, getStage } from "./main";
 import Konva from "konva";
 
 export function wheel(e: KonvaEventObject<WheelEvent>, handle: Konva.Stage) {
@@ -62,38 +62,47 @@ export function allyUp(e: KeyboardEvent, handle: Konva.Stage) {
   }
 }
 
-export function placePixel(x: number, y: number): void;
+export function placePixel(x: number, y: number, color: string): void;
 export function placePixel(stage: Konva.Stage): void;
-export function placePixel(arg1: number | Konva.Stage, arg2?: number): void {
+export function placePixel(arg1: number | Konva.Stage, arg2?: number, arg3?: string): void {
+  function callToServ(x: number, y: number, color: string) {
+    getServerWorker().postMessage({type: "pixel", data: {color, x, y}})
+  }
+
   function pix(layer: Konva.Layer, x: number, y: number, color: string) {
     console.debug(`trying to place on: ${x}, ${y}`);
     const pixel = layer.findOne(`.${x}_${y}`);
     if (pixel !== undefined) {
       console.debug(`found pixel on: ${x}, ${y}`); 
+      if (pixel.getAttr("fill") == color) return;
       pixel.setAttr("fill", color);
+      callToServ(x, y, color);
     } else {
       console.debug(`creating pixel on: ${x}, ${y}`); 
       layer.add(
         new Konva.Rect({ width: 1, height: 1, fill: color, x: x, y: y, name: `${x}_${y}` })
       );
+      callToServ(x, y, color);
     }
+    layer.cache({pixelRatio: 4});
   }
 
-  const color = getColor();
   if (typeof arg1 === "number" && typeof arg2 === "number") {
     const x = arg1 as number;
     const y = arg2 as number;
+    const color = arg3 as string;
     const layer = getStage()
       .getLayers()
       .filter((val) => val.id() == "main")
       .shift() as Konva.Layer;
 
     //TODO: Fix manual limit (get limit from server)
-    if (x > 0 && x < 512 && y > 0 && y < 512) {
+    if (x >= 0 && x < 512 && y >= 0 && y < 512) {
       pix(layer, x, y, color);
     }
   } else {
     const stage = arg1 as Konva.Stage;
+    const color = getColor();
     const layer = stage
       .getLayers()
       .filter((val) => val.id() == "main")
@@ -154,3 +163,9 @@ export function makeClouds(backgroundLayer: Konva.Layer) {
     }
   });
 }
+
+//* types zone
+export type genericData = {type: string, data: object};
+export type playerCount = {type: "playerCount", data: {count: number}};
+export type pixelPlace = {type: "pixel", data: {color: string, x: number, y: number}};
+export type pixelBatch = {type: "pixel", data: {color: string, x: string, y: string}[]};

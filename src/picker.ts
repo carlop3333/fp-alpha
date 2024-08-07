@@ -45,7 +45,6 @@ export class colorPicker {
   }
 
   #setEventListeners() {
-
     this.block.canvas.onmousedown = () => {
 
       //listener that gets ImageData
@@ -58,6 +57,10 @@ export class colorPicker {
         //removes listener, hoping does not cause a memo leak
         this.block.canvas.onmousemove = null;
       }
+    }
+    this.block.canvas.onclick = (ev) => {
+      var d = this.block.getImageData(ev.offsetX, ev.offsetY, 1, 1)
+      this.#setColor('#' + componentToHex(d.data[0]) + componentToHex(d.data[1]) + componentToHex(d.data[2]));
     }
   }
 
