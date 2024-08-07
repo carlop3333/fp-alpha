@@ -168,4 +168,3 @@ export function makeClouds(backgroundLayer: Konva.Layer) {
 export type genericData = {type: string, data: object};
 export type playerCount = {type: "playerCount", data: {count: number}};
 export type pixelPlace = {type: "pixel", data: {color: string, x: number, y: number}};
-export type pixelBatch = {type: "pixel", data: {color: string, x: string, y: string}[]};

@@ -11,11 +11,11 @@ import {
   genericData,
   playerCount,
   pixelPlace,
-  pixelBatch,
 } from "./helpers";
 import { createSymbol, setupStats } from "./utils";
 import { colorPicker } from "./picker";
 import { updateDropdown } from "./dropdown";
+import Timeout = NodeJS.Timeout
 
 //* writables go here
 let isDropOpen = false;
@@ -139,7 +139,7 @@ main.on("click", () => {
   if (!isSpray()) placePixel(main);
 });
 
-var fillId: NodeJS.Timeout | undefined;
+var fillId: Timeout | undefined;
 main.on("mouseup mousedown", ({ type }) => {
   if (isSpray() && type == "mousedown") {
     fillId = setInterval(() => {
