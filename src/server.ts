@@ -52,10 +52,10 @@ onmessage = (ev) => {
       const pixel = msg as pixelPlace;
       //TODO: Determined by server
       const chunkSize = 0xff;
-      const chunkX = pixel.data.x <= 0xff ? 0x0 : 0x1;
-      const chunkY = pixel.data.y <= 0xff ? 0x0 : 0x1;
-      const x = pixel.data.y >= 0xff ? pixel.data.x + chunkSize - (chunkSize * 2) : pixel.data.x;
-      const y = pixel.data.y >= 0xff ? pixel.data.y + chunkSize - (chunkSize * 2) : pixel.data.y;
+      const chunkX = pixel.data.x > 0xff ? 0x1 : 0x0;
+      const chunkY = pixel.data.y > 0xff ? 0x1 : 0x0;
+      const x = pixel.data.x > 0xff ? pixel.data.x + chunkSize - (chunkSize * 2) : pixel.data.x;
+      const y = pixel.data.y > 0xff ? pixel.data.y + chunkSize - (chunkSize * 2) : pixel.data.y;
       const color = hexStrTo8(pixel.data.color.replace("#", ""));
       server.send(new Uint8Array([0x1, chunkX, chunkY, x, y, ...color]));
       break;
