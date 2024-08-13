@@ -1,4 +1,4 @@
-import { componentToHex } from "./utils";
+import { componentToHex } from "../utils";
 
 export class colorPicker {
   block: CanvasRenderingContext2D;

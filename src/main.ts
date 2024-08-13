@@ -10,15 +10,16 @@ import {
   allyUp,
   genericData,
   playerCount,
-  pixelPlace,
+  pixelData,
+  errorData,
+  adminMsg,
 } from "./helpers";
-import { createSymbol, setupStats } from "./utils";
-import { colorPicker } from "./picker";
-import { updateDropdown } from "./dropdown";
-import Timeout = NodeJS.Timeout
-
-//* writables go here
-let isDropOpen = false;
+import { createMaterialSymbol, setupStats } from "./utils";
+import { colorPicker } from "./menus/picker";
+import Timeout = NodeJS.Timeout;
+import { Dropdown } from "./menus/dropdown";
+import { MenuHandler } from "./menus/menu";
+import { launchErrorPage } from "./menus/error";
 
 //* start stats first
 const stats = setupStats(document);
@@ -31,18 +32,15 @@ const picker = new colorPicker(
 );
 picker.setup();
 
-//then setup dropdown
-const dropbutton = document.getElementById("dropdown") as HTMLButtonElement;
-const dropcontent = document.getElementById("ddwn-content") as HTMLDivElement;
-dropbutton.addEventListener("click", () => {
-  if (isDropOpen) {
-    dropcontent.style.display = "none";
-    isDropOpen = false;
-  } else {
-    dropcontent.style.display = "block";
-    isDropOpen = true;
-  }
-});
+//* Create menu handler
+const menu = new MenuHandler(document.body);
+
+//* Create dropdown handler
+new Dropdown(
+  document.getElementById("dropdown") as HTMLButtonElement,
+  document.getElementById("ddwn-content") as HTMLDivElement,
+  menu
+);
 
 //*get canvas
 const canvas = document.querySelector<HTMLDivElement>("#canvas");
@@ -68,8 +66,8 @@ main.add(mainLayer).add(backgroundLayer);
 mainLayer.add(
   //1+ w/h as a fix
   new Konva.Rect({
-    width: 510,
-    height: 510,
+    width: 511,
+    height: 511,
     fill: "#CECECE",
     x: 0,
     y: 0,
@@ -120,11 +118,17 @@ serverInstance.onmessage = (ev) => {
   switch (msg.type) {
     case "playerCount":
       pCount.innerHTML = ""; //cleans it
-      pCount.append(createSymbol("group"), (msg as playerCount).data.count.toString());
+      pCount.append(createMaterialSymbol("group", "little"), (msg as playerCount).data.count.toString());
       break;
     case "pixel":
-      const pix = (msg as pixelPlace).data;
+      const pix = (msg as pixelData).data;
       placePixel(pix.x, pix.y, pix.color);
+      break;
+    case "error":
+      launchErrorPage(menu, (msg as errorData).data.code, (msg as errorData).data.reason);
+      break;
+    case "adminMsg":
+      menu.pushNotification(`> Admin global message: ${(msg as adminMsg).data.text}`, 5);
       break;
   }
 };
@@ -151,13 +155,10 @@ main.on("mouseup mousedown", ({ type }) => {
 
 const abcol = document.getElementById("abcol") as HTMLSpanElement;
 
-main.on("pointermove", (ev) => {
-  if (isDropOpen) {
-    updateDropdown(dropcontent, ev.evt, ev.target as Konva.Stage);
-  }
+main.on("pointermove", () => {
   const absolPos = main.getRelativePointerPosition()!;
   //TODO: Fix manual limit (get limit from server)
-  if (absolPos.x > 0 && absolPos.x <= 510 && absolPos.y > 0 && absolPos.y <= 510) {
+  if (absolPos.x > 0 && absolPos.x < 510 && absolPos.y > 0 && absolPos.y < 510) {
     abcol.textContent = `(${Math.floor(absolPos.x).toFixed()},${Math.floor(absolPos.y).toFixed()})`;
   }
 });

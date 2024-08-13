@@ -1,3 +1,5 @@
+/* github.com/carlop3k - 2024  */
+
 /* * {
   border: red 0.2px solid;
 }
@@ -19,9 +21,38 @@ h3 {
   font-style: normal;
 }
 
+.fpfont.big {
+  font-size: 2cm;
+}
+.fpfont.tittle {
+  font-size: 1cm;
+  text-align: center;
+  margin-bottom: 2px;
+}
+
+.fpfont.little {
+  font-size: 0.6cm;
+  line-height: 10%;
+}
+
 .hud {
   z-index: 1;
   position: absolute;
+}
+
+/* any button */
+.fpbutton {
+  width: 100%;
+  margin: 2px 0px 2px 0px;
+  height: 0.8cm;
+  background-color: white;
+  border: 2px solid black;
+  border-radius: 4px;
+  transition: background-color 0.4s cubic-bezier(.01,1.01,.27,.99);
+}
+.fpbutton:hover {
+  background-color: rgb(218, 188, 149);
+  cursor: pointer;
 }
 
 /* dropdown */
@@ -30,8 +61,9 @@ h3 {
   margin-top: 0px;
   top: 55px;
   position: fixed;
-  border: none;
+  border: 2px solid black;
   background-color: #faffb6;
+  cursor: pointer;
 }
 
 #dropdown:hover {
@@ -39,15 +71,17 @@ h3 {
 }
 
 #ddwn-content {
-  display: none;
-  background: white;
+  border: 2px solid black;
+  background: #ffe4ab;
   position: fixed;
   margin: 0.4cm;
   margin-top: 0px;
   top: 86px;
   line-height: 60%;
+  padding: 0.2cm;
 }
 
+/* coordinates */
 #abcol {
   position: fixed;
   bottom: 0px;
@@ -62,6 +96,7 @@ h3 {
   border: black solid 0.4px;
 }
 
+/* player count */
 #pcount {
   position: fixed;
   bottom: 0px;
@@ -76,7 +111,6 @@ h3 {
   border: black solid 0.4px;
 }
 
-
 #color-picker {
   right: 0px;
   bottom: 0px;
@@ -84,7 +118,7 @@ h3 {
   position: fixed;
   display: grid;
   height: 6cm;
-  background-color: #fad369;
+  background-color: #ffc445;
   transition: opacity 0.5s cubic-bezier(0, 0.86, 0.57, 1);
   z-index: 2;
   border: black solid 3px;
@@ -117,8 +151,7 @@ h3 {
 }
 
 #alphanote {
-  z-index: 2;
-  background-color: rgb(255, 196, 69);
+  background-color: #ffc445;
   margin: 0px;
   width: 100%;
   height: 50px;
@@ -126,6 +159,7 @@ h3 {
   text-align: center;
   position: fixed;
   border-bottom: black solid 2px;
+  z-index: 2;
 }
 
 #canvas {
@@ -133,11 +167,12 @@ h3 {
   z-index: 0;
 }
 
-.mso-edit {
-  font-family: 'Material Symbols Outlined';
+/* for items */
+.mso {
+  font-family: "Material Symbols Outlined";
   font-weight: normal;
   font-style: normal;
-  font-size: 20px;
+  font-size: 24px;
   line-height: 1;
   letter-spacing: normal;
   vertical-align: bottom;
@@ -146,6 +181,116 @@ h3 {
   white-space: nowrap;
   word-wrap: normal;
   direction: ltr;
-  font-feature-settings: 'liga';
+  font-feature-settings: "liga";
   -moz-osx-font-smoothing: grayscale;
+}
+
+.mso.little {
+  font-size: 20px;
+}
+.mso.big {
+  font-size: 48px;
+}
+
+/** Menu containers */
+
+/* notification */
+#notification {
+  width: 350px;
+  max-height: 110px;
+  top: 60px;
+  position: fixed;
+  padding: 15px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background-color: #ffc445;
+  border: 3px black solid;
+  border-radius: 4px;
+  /* hide/show notif (anim is not reliable, yet) */
+  transition-delay: 0.2s;
+  transition: right 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+  right: -12cm;
+}
+
+/* Notification close button */
+.closebutton {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  position: absolute;
+  right: 5px;
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: pointer;
+}
+
+/* Menu close button */
+.closebutton.big {
+  width: 48px;
+  height: 48px;
+  right: 2px;
+}
+
+
+/* TODO Notification line animation
+@keyframes lineload {
+  
+} */
+
+/* background with semi-transparent background */
+#overlay {
+  z-index: 1;
+  position: absolute;
+  background-color: rgba(0,0,0,0.4);
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  align-content: center;
+  opacity: 0;
+}
+
+
+/*basic menu*/
+.menu {
+  width: 80%;
+  height: 85%;
+  background-color: #fdda99;
+  margin: auto;
+  margin-top: 50px;
+  border: 3px solid black;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  /*fix for the button*/
+  position: fixed;
+  top: 5%;
+  right: 10%;
+}
+
+.menu.mini {
+  width: 30%;
+  height: 35%;
+  background-color: #eec259;
+  /*fix for the button...*/
+  top: 30%;
+  right: 35%;
+}
+
+/* error menu */
+#reloadwind {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background-color: rgba(0, 0, 0, 0.5);
+  position: absolute;
+  align-content: center;
+  text-align: center;
+  top: 0px;
+  color: #ffffff;
+  /* for animate */
+  transition: opacity 1s cubic-bezier(.14,.7,.55,.97);
+  opacity: 0;
+}
+
+@media only screen and (max-width: 300px) {
 }

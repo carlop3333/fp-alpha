@@ -99,7 +99,7 @@ export function placePixel(arg1: number | Konva.Stage, arg2?: number, arg3?: str
       .shift() as Konva.Layer;
 
     //TODO: Fix manual limit (get limit from server)
-    if (x >= 0 && x < 512 && y >= 0 && y < 512) {
+    if (x >= 0 && x < 510 && y >= 0 && y < 510) {
       pix(layer, x, y, color);
     }
   } else {
@@ -169,5 +169,7 @@ export function makeClouds(backgroundLayer: Konva.Layer) {
 
 //* types zone
 export type genericData = {type: string, data: object};
-export type playerCount = {type: "playerCount", data: {count: number}};
-export type pixelPlace = {type: "pixel", data: {color: string, x: number, y: number}};
+export interface playerCount extends genericData {data: {count: number}};
+export interface pixelData extends genericData {data: {color: string, x: number, y: number}};
+export interface errorData extends genericData {data: {code: number, reason: string}};
+export interface adminMsg extends genericData {data: {text: string}};

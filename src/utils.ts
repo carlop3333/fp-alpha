@@ -49,12 +49,13 @@ export async function loadTextures(urls: Array<string>): Promise<HTMLImageElemen
     })
 }
 
-export function createSymbol(symbolName: string): HTMLSpanElement {
-  const symbol = document.createElement("span");
-  symbol.className = "mso-edit";
+export function createMaterialSymbol(symbolName: string, size: "little" | "big"): HTMLElement {
+  const symbol = document.createElement("i");
+  symbol.className = `mso ${size}`;
   symbol.textContent = symbolName;
   return symbol;
 }
+
 
 export function bufferToHexStr(b: Uint8Array): string {
   let s = "";

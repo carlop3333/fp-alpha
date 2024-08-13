@@ -1,4 +1,4 @@
-import { genericData, pixelPlace } from "./helpers";
+import { genericData, pixelData } from "./helpers";
 import { bufferToHexStr, hexStrTo8 } from "./utils";
 
 console.log("Connecting to server...");
@@ -36,6 +36,8 @@ server.onmessage = (ev) => {
     case 0x3:
       switch (d[1]) {
         case 0x0:
+          const text = new TextDecoder().decode(d.slice(2));
+          postMessage({type: "adminMsg", data: {text}});
           break;
         case 0x1:
           postMessage({ type: "playerCount", data: { count: d[2] } });
@@ -49,7 +51,7 @@ onmessage = (ev) => {
   const msg = ev.data as genericData;
   switch (msg.type) {
     case "pixel":
-      const pixel = msg as pixelPlace;
+      const pixel = msg as pixelData;
       //TODO: Determined by server
       const chunkSize = 0xff;
       const chunkX = pixel.data.x > 0xff ? 0x1 : 0x0;
@@ -63,5 +65,5 @@ onmessage = (ev) => {
 };
 
 server.onclose = (ev) => {
-  postMessage({ type: "error", code: ev.code, reason: ev.reason });
+  postMessage({ type: "error", data: {code: ev.code, reason: ev.reason} });
 };

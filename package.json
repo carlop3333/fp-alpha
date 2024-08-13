@@ -9,13 +9,15 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240806.0",
     "@types/node": "^22.1.0",
     "@types/stats.js": "^0.17.3",
-    "typescript": "^5.2.2",
+    "typescript": "^5.5.4",
     "vite": "^5.3.4"
   },
   "dependencies": {
     "konva": "^9.3.14",
+    "marked": "^14.0.0",
     "stats.js": "^0.17.0"
   }
 }
