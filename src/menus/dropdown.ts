@@ -5,24 +5,10 @@ const buttonFuncs = [changelog, factionsMenu, userMenu, settingsMenu];
 
 async function changelog(menu: MenuHandler) {
   const m = menu.createMenu("normal", { close: true, title: "Changelog" });
-  //yisus
-  const log = await marked(`## Alpha 0.0.1
-
-- Added the changelog.
-- Added notifications. (This includes an error screen).
-- Some preparations/optimizations for next minor release.
-
-Note that i'm focusing more on a faction/user system for now, as well that i'm busy so expect slow releases. 
-
-Also that mobile support is on the way (in a limited manner for now).
-
-## Initial release
-
-This includes the color picker, the (unoptimized) canvas with a bit of deco (clouds)` /* await (await fetch("https://static.foreverplaced.net/changelog.md")).text() */);
-  m.editZone.style.padding = "8px";
-  m.editZone.className = "fpfont";
-  m.editZone.innerHTML = log;
-  m.draw();
+  const req = await fetch("http://127.0.0.1:8787/api/changelog", {cache: "default"});
+  m.editZone.className = "fpfont paragraph";
+  m.editZone.innerHTML = await marked(await req.text());
+  m.draw();  
 }
 
 function factionsMenu(menu: MenuHandler) {
