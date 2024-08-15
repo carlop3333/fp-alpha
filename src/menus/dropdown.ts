@@ -5,7 +5,7 @@ const buttonFuncs = [changelog, factionsMenu, userMenu, settingsMenu];
 
 async function changelog(menu: MenuHandler) {
   const m = menu.createMenu("normal", { close: true, title: "Changelog" });
-  const req = await fetch("http://127.0.0.1:8787/api/changelog", {cache: "default"});
+  const req = await fetch("https://backend.foreverplaced.net/api/changelog", {cache: "default"});
   m.editZone.className = "fpfont paragraph";
   m.editZone.innerHTML = await marked(await req.text());
   m.draw();  
