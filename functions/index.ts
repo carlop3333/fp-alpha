@@ -56,36 +56,21 @@ interface Env {
 }
 
 export const onRequest: PagesFunction<Env> = async (ctx) => {
-  const cache = caches.default;
-  let cached = await cache.match(new Request(ctx.request.url));
-  if (cached && cached.headers.get("etag") == ctx.request.headers.get("if-none-match")) {
-    console.debug("Cache hit > Already downloaded");
-    return new Response(undefined, { status: 304 });
-  } else if (cached) {
-    console.debug("Cache hit > Not downloaded");
-    return cached;
-  }
-  console.log("Caching...");
   const maint = await ctx.env.maintenance.get("maintenance", "text");
+  console.debug(maint);
   if (maint === "true") {
     const res = new Response(maintenance, {
       headers: {
         "Content-Type": "text/html",
-        "Cache-Control": "public, maxage=300, must-revalidate",
-        ETag: randomUUID(),
       },
     });
-    cache.put(new Request(ctx.request.url), res.clone());
     return res;
   } else {
     const res = new Response(page, {
       headers: {
         "Content-Type": "text/html",
-        "Cache-Control": "public, maxage=300, must-revalidate",
-        ETag: randomUUID(),
       },
     });
-    cache.put(new Request(ctx.request.url), res.clone());
     return res;
   }
 };
