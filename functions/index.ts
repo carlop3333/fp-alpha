@@ -69,7 +69,7 @@ export const onRequest: PagesFunction<Env> = async (ctx) => {
     const res = new Response(maintenance, {
       headers: {
         "Content-Type": "text/html",
-        "Cache-Control": "s-maxage=600, must-revalidate",
+        "Cache-Control": "public, maxage=300, must-revalidate",
         ETag: randomUUID(),
       },
     });
@@ -79,7 +79,7 @@ export const onRequest: PagesFunction<Env> = async (ctx) => {
     const res = new Response(page, {
       headers: {
         "Content-Type": "text/html",
-        "Cache-Control": "s-maxage=600, must-revalidate",
+        "Cache-Control": "public, maxage=300, must-revalidate",
         ETag: randomUUID(),
       },
     });
