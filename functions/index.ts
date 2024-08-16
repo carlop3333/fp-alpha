@@ -59,8 +59,10 @@ export const onRequest: PagesFunction<Env> = async (ctx) => {
   const cache = caches.default;
   let cached = await cache.match(new Request(ctx.request.url));
   if (cached && cached.headers.get("etag") == ctx.request.headers.get("if-none-match")) {
+    console.debug("Cache hit > Already downloaded");
     return new Response(undefined, { status: 304 });
   } else if (cached) {
+    console.debug("Cache hit > Not downloaded");
     return cached;
   }
   console.log("Caching...");
