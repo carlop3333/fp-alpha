@@ -178,6 +178,16 @@ h3 {
   position: relative;
   z-index: 0;
 }
+/* history mode hud */
+#historyhud {
+  position: fixed;
+  width: 4.5cm;
+  height: 2.5cm;
+  background: rgb(160, 132, 228);
+  top: 60px;
+  left: 5.5cm;
+  opacity: 0;
+}
 
 /* for items */
 .mso {

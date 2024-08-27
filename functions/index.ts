@@ -1,6 +1,5 @@
 //@ts-ignore
 import page from "../dist/index.html";
-import { randomUUID } from "node:crypto";
 
 const maintenance = `<!DOCTYPE html><html><head>
   <title>ForeverPlaced - Maintenance</title>
