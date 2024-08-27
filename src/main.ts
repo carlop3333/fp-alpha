@@ -82,6 +82,10 @@ main.position({ x: centerX - 256, y: centerY - 256 });
 //clouds in da background
 makeClouds(backgroundLayer);
 
+menu.pushNotification("Loading canvas...", 3);
+//get inital rendered batch
+
+
 //get initial batch
 fetch("https://backend.foreverplaced.net/initialbatch").then((res) => {
   res.json().then((data) => {

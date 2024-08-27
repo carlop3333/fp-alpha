@@ -1,0 +1,9 @@
+name = "foreverplaced"
+pages_build_output_dir = "./dist"
+
+compatibility_date = "2024-08-06"
+compatibility_flags = ["nodejs_compat"]
+
+# [[kv_namespaces]]
+# binding = "maintenance"
+# id = "14256635fae2400d96d4c0dd7653083f"

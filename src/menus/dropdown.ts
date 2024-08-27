@@ -1,28 +1,23 @@
 import { MenuHandler } from "./menu";
 import { marked } from "marked";
 
-const buttonFuncs = [changelog, factionsMenu, userMenu, settingsMenu];
+const buttonFuncs = [changelog, historyMode, factionsMenu, userMenu, settingsMenu];
 
 async function changelog(menu: MenuHandler) {
   const m = menu.createMenu("normal", { close: true, title: "Changelog" });
-  //yisus
-  const log = await marked(`## Alpha 0.0.1
+  const req = await fetch("https://backend.foreverplaced.net/changelog", {cache: "default"});
+  m.editZone.className = "fpfont paragraph";
+  m.editZone.innerHTML = await marked(await req.text());
+  m.draw();  
+}
 
-- Added the changelog.
-- Added notifications. (This includes an error screen).
-- Some preparations/optimizations for next minor release.
+async function historyMode(menu: MenuHandler) {
+  const animSettings: KeyframeAnimationOptions = { duration: 350, easing: "cubic-bezier(0,1.16,.81,1)", fill: "forwards"}
+  const ui = menu.createRawPopup("historyhud");
+  ui.animate([{ opacity: 0 }, { opacity: 1 }], animSettings);
 
-Note that i'm focusing more on a faction/user system for now, as well that i'm busy so expect slow releases. 
-
-Also that mobile support is on the way (in a limited manner for now).
-
-## Initial release
-
-This includes the color picker, the (unoptimized) canvas with a bit of deco (clouds)` /* await (await fetch("https://static.foreverplaced.net/changelog.md")).text() */);
-  m.editZone.style.padding = "8px";
-  m.editZone.className = "fpfont";
-  m.editZone.innerHTML = log;
-  m.draw();
+  /* ui.animate([{ opacity: 1 }, { opacity: 0 }], animSettings);
+  setTimeout(() => menu.closeRawPopup("historyhud"), 350); */
 }
 
 function factionsMenu(menu: MenuHandler) {
@@ -30,7 +25,8 @@ function factionsMenu(menu: MenuHandler) {
 }
 
 function userMenu(menu: MenuHandler) {
-  menu.pushNotification("Coming soon!", 3);
+  const m = menu.createMenu("mini");
+  m.draw();
 }
 
 function settingsMenu(menu: MenuHandler) {
@@ -57,6 +53,8 @@ export class Dropdown {
         <h2 class="fpfont" style="text-align: center">Menu</h2>
         <div id="button-container">
           <button type="button" class="fpbutton">Changelog</button>
+          <br>
+          <button type="button" class="fpbutton">Historical view</button>
           <br>
           <button type="button" class="fpbutton">Factions menu (soon!)</button>
           <br>
