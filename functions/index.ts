@@ -55,9 +55,10 @@ interface Env {
 }
 
 export const onRequest: PagesFunction<Env> = async (ctx) => {
-  const maint = await ctx.env.maintenance.get("maintenance", "text");
+  const maint = "false";/* await ctx.env.maintenance.get("maintenance", "text"); */
   console.debug(maint);
-  if (maint === "true") {
+  //@ts-ignore
+  if (maint == "true") {
     const res = new Response(maintenance, {
       headers: {
         "Content-Type": "text/html",
