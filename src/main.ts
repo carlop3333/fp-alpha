@@ -1,189 +1,79 @@
-import "./styles.css";
-import Konva from "konva";
-import {
-  allyDown,
-  canvasReset,
-  placePixel,
-  makeClouds,
-  wheel,
-  isSpray,
-  allyUp,
-  genericData,
-  playerCount,
-  pixelData,
-  errorData,
-  adminMsg,
-} from "./helpers";
-import { createMaterialSymbol, setupStats } from "./utils";
-import { colorPicker } from "./menus/picker";
-import Timeout = NodeJS.Timeout;
-import { Dropdown } from "./menus/dropdown";
-import { MenuHandler } from "./menus/menu";
-import { launchErrorPage } from "./menus/error";
+//Clarity is beta-only; maybe on releases will be removed.
+import Clarity from "@microsoft/clarity";
 
-//* start stats first
-const stats = setupStats(document);
+import { setupNative } from "./helpers/native";
+import { createHud } from "./menus/hud";
+import { SuperMenuHandler } from "./menus/menu";
+import { FPData, hideElement, setupStats, showElement } from "./utils";
+import { setMaintenance } from "./menus/maintenance";
+/* import { setMaintenance } from "./menus/maintenance"; */
 
-//* setup color picker
-const picker = new colorPicker(
-  document.getElementById("color-block") as HTMLCanvasElement,
-  document.getElementById("color-input") as HTMLInputElement,
-  document.getElementById("color-label") as HTMLLabelElement
-);
-picker.setup();
+const FP_URL = (import.meta.env.DEV) ? "http://127.0.0.1:8788" : "https://foreverplaced.net";
 
-//* Create menu handler
-const menu = new MenuHandler(document.body);
+//* FIRST AFTER EVERYTHING: create menu handler
+const rootHandler = new SuperMenuHandler(document.body);
 
-//* Create dropdown handler
-new Dropdown(
-  document.getElementById("dropdown") as HTMLButtonElement,
-  document.getElementById("ddwn-content") as HTMLDivElement,
-  menu
-);
+let isUnsupported = false;
+export const setUnSupported = (is: boolean) => (isUnsupported = is);
 
-//*get canvas
-const canvas = document.querySelector<HTMLDivElement>("#canvas");
-//apply legacy background
-canvas!.style.transition = "background-color 0.2s cubic-bezier(0.33, 1, 0.68, 1)";
-canvas!.style.backgroundColor = "rgb(100, 205, 238)";
+//* setup native
+await setupNative();
 
-//* start canvas
-const main = new Konva.Stage({
-  container: canvas!,
-  width: window.innerWidth,
-  height: window.innerHeight,
-  draggable: true,
-});
-const mainLayer = new Konva.Layer({ listening: false, id: "main" });
-const backgroundLayer = new Konva.Layer();
-//window center
-const centerX = window.innerWidth / 2;
-const centerY = window.innerHeight / 2;
+//* FIRST OF ALL, CHECK THE WHOLE DATA
+const data: FPData = await fetch(new URL("data", FP_URL)).then(async (res) => {
+  const {discordLink, maintenance, maintenanceReason, server} = await res.json() 
+  const obj: FPData = {discordLink, maintenance: ((maintenance === "true") ? true : false), maintenanceReason, server: new URL(server)};
+  return obj;
+})
 
-main.add(mainLayer).add(backgroundLayer);
-//pixel background
-mainLayer.add(
-  //1+ w/h as a fix
-  new Konva.Rect({
-    width: 511,
-    height: 511,
-    fill: "#CECECE",
-    x: 0,
-    y: 0,
-    shadowColor: "#000",
-    shadowBlur: 5,
-    shadowOpacity: 0.5,
-    shadowOffset: { x: -10, y: 20 },
-  })
-);
-main.position({ x: centerX - 256, y: centerY - 256 });
+if (!data.maintenance) {
 
-//clouds in da background
-makeClouds(backgroundLayer);
+  await hideElement(document.body, 500);
+  document.getElementById("temporal")?.remove();
 
-menu.pushNotification("Loading canvas...", 3);
-//get inital rendered batch
+  /* const [hud, hudHandler] = rootHandler.createMenuHandler("hud");
+  const canvasDiv = rootHandler.createRawElement("canvas");  */
 
 
-//get initial batch
-fetch("https://backend.foreverplaced.net/initialbatch").then((res) => {
-  res.json().then((data) => {
-    console.log("Downloaded initial pixel batch.");
-    const pixels = new Array<Konva.Rect>();
-    for (const pixel of data) {
-      const px = mainLayer.findOne(`.${pixel.x}_${pixel.y}`);
-      if (px !== undefined) {
-        if (px.getAttr("fill") == `#${pixel.color}`) return;
-        px.setAttr("fill", `#${pixel.color}`);
-      } else {
-        pixels.push(
-          new Konva.Rect({
-            width: 1,
-            height: 1,
-            fill: `#${pixel.color}`,
-            x: parseInt(pixel.x),
-            y: parseInt(pixel.y),
-            name: `${pixel.x}_${pixel.y}`,
-          })
-        );
-      }
-    }
-    mainLayer.add(...pixels);
-    mainLayer.cache({ pixelRatio: 4 });
-  });
-});
+  //* setup stats
+  const stats = setupStats(document);
+  
 
-//* start server connection
-const serverInstance = new Worker(new URL("./server.ts", import.meta.url), { type: "module" });
-const pCount = document.getElementById("pcount") as HTMLSpanElement;
-serverInstance.onmessage = (ev) => {
-  const msg = ev.data as genericData;
-  switch (msg.type) {
-    case "playerCount":
-      pCount.innerHTML = ""; //cleans it
-      pCount.append(createMaterialSymbol("group", "little"), (msg as playerCount).data.count.toString());
-      break;
-    case "pixel":
-      const pix = (msg as pixelData).data;
-      placePixel(pix.x, pix.y, pix.color);
-      break;
-    case "error":
-      launchErrorPage(menu, (msg as errorData).data.code, (msg as errorData).data.reason);
-      break;
-    case "adminMsg":
-      menu.pushNotification(`> Admin global message: ${(msg as adminMsg).data.text}`, 5);
-      break;
+  //* Setup Clarity
+  if (isUnsupported)
+    rootHandler.pushNotification(
+      "Firefox is not supported.",
+      "warning",
+      "You cannot send feedback on Beta if you're using Firefox. This will be fixed in the future (Store release).",
+      6
+    );
+  else {
+    //TODO: Add user-id in order to make ux 1000x better
+    Clarity.init("p3s2j9obbf"); 
+    // Detect that the user has an adblocker in order to tell that no feedback will be possible
+    //* use atob in order to avoid adblock link remove
+    await fetch(atob("aHR0cHM6Ly93d3cuY2xhcml0eS5tcy9jb2xsZWN0")).catch(() => {console.log("Adblocker detected")}) 
+    
   }
-};
 
-//Event listeners
-main.on("wheel", (e) => wheel(e, main));
-window.addEventListener("resize", canvasReset);
-window.addEventListener("keydown", (e) => allyDown(e, main));
-window.addEventListener("keyup", (e) => allyUp(e, main));
+  createHud(rootHandler);
 
-main.on("click", () => {
-  if (!isSpray()) placePixel(main);
-});
 
-var fillId: Timeout | undefined;
-main.on("mouseup mousedown", ({ type }) => {
-  if (isSpray() && type == "mousedown") {
-    fillId = setInterval(() => {
-      placePixel(main);
-    }, 50);
+
+  //* Loading ended.
+  showElement(document.body, "#FFF", 500);
+
+  function mainLoop() {
+    stats.begin();
+
+    stats.end();
+    requestAnimationFrame(mainLoop);
   }
-  if (type == "mouseup") clearInterval(fillId);
-});
 
-const abcol = document.getElementById("abcol") as HTMLSpanElement;
-
-main.on("pointermove", () => {
-  const absolPos = main.getRelativePointerPosition()!;
-  //TODO: Fix manual limit (get limit from server)
-  if (absolPos.x > 0 && absolPos.x < 510 && absolPos.y > 0 && absolPos.y < 510) {
-    abcol.textContent = `(${Math.floor(absolPos.x).toFixed()},${Math.floor(absolPos.y).toFixed()})`;
-  }
-});
-
-function mainLoop() {
-  stats.begin();
-
-  mainLayer.draw();
-
-  stats.end();
   requestAnimationFrame(mainLoop);
+} else {
+  await hideElement(document.body, 500);
+  document.getElementById("temporal")?.remove();
+  setMaintenance(rootHandler, data.maintenanceReason);
+  showElement(document.body, "#7166f2", 500);
 }
-//not going to export main and picker fuck that
-export function getStage() {
-  return main;
-}
-export function getColor() {
-  return picker.color;
-}
-export function getServerWorker() {
-  return serverInstance;
-}
-
-requestAnimationFrame(mainLoop);

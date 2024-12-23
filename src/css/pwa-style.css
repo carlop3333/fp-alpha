@@ -1,0 +1,49 @@
+@import url("global.css");
+
+html {
+    border: 5px red solid;
+}
+
+.mso {
+    font-size: 24px;
+  }
+  
+  .mso.little {
+    font-size: 20px;
+  }
+  .mso.big {
+    font-size: 48px;
+  }
+  
+  /* For notifications text */
+  .fpfont.notif {
+    margin-right: 10px;
+    margin-bottom: 8px;
+  }
+  
+  .fpfont.noweight {
+    font-weight: inherit;
+  }
+  
+  .fpfont.big {
+    font-size: 2cm;
+  }
+  .fpfont.title {
+    font-size: 0.7cm;
+    text-align: center;
+    margin-bottom: 2px;
+    position: relative;
+  }
+  
+  .fpfont.little {
+    font-size: 0.6cm;
+    line-height: 10%;
+  }
+  
+  .fpfont.paragraph {
+    padding: 16px;
+    padding-top: 0px;
+    font-size: 18px;
+    overflow-y: auto;
+  }
+  

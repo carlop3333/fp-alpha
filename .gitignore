@@ -23,5 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 
+# Capacitor (gen with npx cap add ios android -- that's for now tho..)
+android/*
+ios/*
+
 # Wrangler
 .wrangler

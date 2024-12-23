@@ -1,0 +1,9 @@
+@import url("mobile-style.css");
+
+body {
+  border: 5px yellowgreen solid;
+}
+
+#hud {
+  top: 30px;
+}

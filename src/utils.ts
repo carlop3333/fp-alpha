@@ -1,15 +1,31 @@
 import Stats from "stats.js";
 
+export interface MutatedDocument extends Document {
+  isMobile: boolean;
+}
+
+export type FPData = {
+  discordLink: string,
+  maintenance: boolean,
+  maintenanceReason: string,
+  server: URL | string
+}
+
 export function checkForScale(scale: number) {
     if (scale > 19) return false;
     else if (scale < 0.95) return false;
     else return true;
 }
-
+/**
+ * 
+ * @param document Document to adjust
+ */
 export function setupStats(document: Document) {
     const stats = new Stats();
     stats.showPanel(0);
     stats.dom.style.right = "0px";
+    stats.dom.style.zIndex = "1";
+    if ((window.document as MutatedDocument).isMobile) stats.dom.style.top = "30px"; 
     stats.dom.style.removeProperty("left");
     document.body.appendChild(stats.dom);
     return stats;
@@ -67,4 +83,28 @@ export function bufferToHexStr(b: Uint8Array): string {
   } else {
     throw new EvalError("malformed hex code!");
   }
+}
+
+export async function hideElement(element: HTMLElement, ms: number) {
+  element.animate([{"opacity": 1}, {"opacity": 0}], ms);
+  return new Promise((res) => {
+    setTimeout(() => res(null), ms)
+  })
+}
+
+/**
+ * Mostly used for the body, but could work anywhere
+ */
+export function showElement(element: HTMLElement, color: string, ms: number) {
+  element.animate([
+    {
+      "opacity": 0,
+      "background": "#000"
+    }, 
+    {
+      "opacity": 1,
+      "background": color
+    }
+  ], ms);
+  element.style.backgroundColor = color;
 }

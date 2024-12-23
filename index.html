@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -19,46 +19,12 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=PT+Sans+Narrow:wght@400;700&display=swap"
     />
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "00cc1b4044ba46e8b820ff220a108d0e"}'></script>
     <title>ForeverPlaced</title>
   </head>
   <body>
-    <div id="alphanote">
-      <h2 class="fpfont">
-        Welcome to ForeverPlaced! (alpha) Check out the
-        <a href="https://discord.gg/fN4pG4AN4F" rel="noreferrer noopener" target="_blank" style="color: #000000;"
-          >Discord</a
-        >!
-      </h2>
+    <div id="temporal" style="display: flex;align-items: center;justify-content: center;height: 100%;">
+      <h1 class="fpfont big" style="color: white;">Loading...</h1>
     </div>
-    <!-- HUD -->
-    <div class="hud">
-      <!-- note at top -->
-      <!-- dropdown -->
-      <button type="button" id="dropdown">
-        <i class="material-symbols-outlined">menu</i>
-      </button>
-      <div id="ddwn-content">
-      </div>
-      <!-- notifications system -->
-      <!-- coordinates -->
-      <span id="pcount" class="fpfont" title="Online players"
-        ><i class="mso little">group</i> ?</span
-      >
-      <span id="abcol" class="fpfont" title="Coordinates">(?,?)</span>
-      <!-- color picker -->
-      <label for="color-input" id="color-label"></label>
-      <div id="color-picker">
-        <canvas id="color-block" height="150" width="160"></canvas>
-        <input
-          type="text"
-          title="Pixel hex color"
-          placeholder="Pixel hex color"
-          id="color-input"
-          maxlength="7"
-        />
-      </div>
-    </div>
-    <!-- HUD END -->
-    <div id="canvas"></div>
   </body>
 </html>

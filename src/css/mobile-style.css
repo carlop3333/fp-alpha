@@ -1,0 +1,73 @@
+@import url("global.css");
+
+html {
+  border: 5px green solid;
+}
+
+#hud {
+  position: relative;
+  height: 94%;
+  width: 100%;
+}
+
+/* Notification */
+
+#notification {
+  width: 250px;
+  max-height: 150px;
+  position: fixed;
+  padding: 15px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background-color: #aa69ff;
+  color: white;
+  border: 3px black solid;
+  border-radius: 4px;
+  /* hide/show notif (anim is not reliable, yet) */
+  transition-delay: 0.2s;
+  transition: right 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+  right: -12cm;
+}
+
+.mso {
+  font-size: 24px;
+}
+
+.mso.little {
+  font-size: 20px;
+}
+.mso.big {
+  font-size: 48px;
+}
+
+/* For notifications text */
+.fpfont.notif {
+  margin-right: 10px;
+  margin-bottom: 8px;
+}
+
+.fpfont.noweight {
+  font-weight: inherit;
+}
+
+.fpfont.big {
+  font-size: 2cm;
+}
+.fpfont.title {
+  font-size: 0.7cm;
+  text-align: center;
+  margin-bottom: 2px;
+  position: relative;
+}
+
+.fpfont.little {
+  font-size: 0.6cm;
+  line-height: 10%;
+}
+
+.fpfont.paragraph {
+  padding: 16px;
+  padding-top: 0px;
+  font-size: 18px;
+  overflow-y: auto;
+}
