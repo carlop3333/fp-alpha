@@ -4,17 +4,38 @@ html {
   border: 5px green solid;
 }
 
+/* Hud elements */
+
 #hud {
   position: relative;
-  height: 94%;
+  height: 98%;
   width: 100%;
+  z-index: 2;
 }
 
-/* Notification */
+#dropdown {
+  position: absolute;
+  left: 0px;
+  width: 4em;
+  height: 4em;
+  background: blue;
+}
 
+#permainfo {
+  background: red;
+  width: 70%;
+  height: 3em;
+  right: 0px;
+  position: absolute;
+}
+
+/*End of hud elements*/
+
+/* Notification */
 #notification {
+  z-index: 4;
   width: 250px;
-  max-height: 150px;
+  max-height: 200px;
   position: fixed;
   padding: 15px;
   padding-top: 5px;
@@ -27,6 +48,7 @@ html {
   transition-delay: 0.2s;
   transition: right 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
   right: -12cm;
+  top: 20px
 }
 
 .mso {
@@ -62,7 +84,9 @@ html {
 
 .fpfont.little {
   font-size: 0.6cm;
-  line-height: 10%;
+  line-height: 90%;
+  margin-top: 0.2cm;
+  margin-bottom: 0;
 }
 
 .fpfont.paragraph {

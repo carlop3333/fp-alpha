@@ -5,5 +5,6 @@ body {
 }
 
 #hud {
-  top: 30px;
+  height: 96%;
+  top: 15px;
 }

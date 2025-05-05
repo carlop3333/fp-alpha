@@ -1,68 +1,56 @@
-//Clarity is beta-only; maybe on releases will be removed.
-import Clarity from "@microsoft/clarity";
-
-import { setupNative } from "./helpers/native";
-import { createHud } from "./menus/hud";
-import { SuperMenuHandler } from "./menus/menu";
+import { SuperMenuHandler } from "./helpers/handler";
 import { FPData, hideElement, setupStats, showElement } from "./utils";
-import { setMaintenance } from "./menus/maintenance";
-/* import { setMaintenance } from "./menus/maintenance"; */
+import { ModuleManager } from "./helpers/module";
+import { setupNative } from "./modules/native";
+import { clarity } from "./modules/clarity";
+import { setMaintenance } from "./modules/menus/maintenance";
+import { mobileHud } from "./modules/menus/hud";
+import { KeyManager } from "./helpers/keys";
 
-const FP_URL = (import.meta.env.DEV) ? "http://127.0.0.1:8788" : "https://foreverplaced.net";
+const FP_URL = import.meta.env.DEV
+  ? "http://127.0.0.1:8788"
+  : "https://foreverplaced.net";
 
-//* FIRST AFTER EVERYTHING: create menu handler
+//* FIRST AFTER EVERYTHING: create handlers
 const rootHandler = new SuperMenuHandler(document.body);
+const modManager = new ModuleManager();
+const keyManager = new KeyManager();
 
-let isUnsupported = false;
-export const setUnSupported = (is: boolean) => (isUnsupported = is);
+//* Declare some shared vars
+modManager.setSharedData("rootHandler", rootHandler);
+modManager.setSharedData("keyManager", keyManager);
+modManager.setSharedData("isUnsupported", false);
+modManager.setSharedData("fpURL", FP_URL);
 
-//* setup native
-await setupNative();
+modManager.registerModule(setupNative);
 
 //* FIRST OF ALL, CHECK THE WHOLE DATA
 const data: FPData = await fetch(new URL("data", FP_URL)).then(async (res) => {
-  const {discordLink, maintenance, maintenanceReason, server} = await res.json() 
-  const obj: FPData = {discordLink, maintenance: ((maintenance === "true") ? true : false), maintenanceReason, server: new URL(server)};
-  return obj;
-})
+  const { discordLink, maintenance, maintenanceReason, server } =
+    await res.json();
+  return {
+    discordLink,
+    maintenance: maintenance === "true" ? true : false,
+    maintenanceReason: maintenance === "true" ? maintenanceReason : false,
+    server: new URL(server),
+  };
+});
 
-if (!data.maintenance) {
+modManager.setSharedData("srvData", data);
 
+async function main() {
   await hideElement(document.body, 500);
-  document.getElementById("temporal")?.remove();
-
-  /* const [hud, hudHandler] = rootHandler.createMenuHandler("hud");
-  const canvasDiv = rootHandler.createRawElement("canvas");  */
-
+  document.getElementById("temporal")!.remove();
 
   //* setup stats
   const stats = setupStats(document);
-  
 
-  //* Setup Clarity
-  if (isUnsupported)
-    rootHandler.pushNotification(
-      "Firefox is not supported.",
-      "warning",
-      "You cannot send feedback on Beta if you're using Firefox. This will be fixed in the future (Store release).",
-      6
-    );
-  else {
-    //TODO: Add user-id in order to make ux 1000x better
-    Clarity.init("p3s2j9obbf"); 
-    // Detect that the user has an adblocker in order to tell that no feedback will be possible
-    //* use atob in order to avoid adblock link remove
-    await fetch(atob("aHR0cHM6Ly93d3cuY2xhcml0eS5tcy9jb2xsZWN0")).catch(() => {console.log("Adblocker detected")}) 
-    
-  }
-
-  createHud(rootHandler);
-
-
-
-  //* Loading ended.
   showElement(document.body, "#FFF", 500);
 
+  //* Setup Clarity and others
+  modManager.registerModule([clarity, mobileHud]);
+
+  //TODO: Move this as a shared module or smth like that
   function mainLoop() {
     stats.begin();
 
@@ -71,9 +59,20 @@ if (!data.maintenance) {
   }
 
   requestAnimationFrame(mainLoop);
-} else {
+}
+
+async function maintenance() {
   await hideElement(document.body, 500);
   document.getElementById("temporal")?.remove();
-  setMaintenance(rootHandler, data.maintenanceReason);
+  modManager.registerModule(setMaintenance);
   showElement(document.body, "#7166f2", 500);
+}
+
+//** INIT
+if (document.readyState !== "complete") {
+  if (!data.maintenance) window.onload = main;
+  else window.onload = maintenance;
+} else {
+  if (!data.maintenance) main();
+  else maintenance();
 }

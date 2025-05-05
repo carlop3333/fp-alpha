@@ -78,11 +78,11 @@ class Menu {
 export class MenuHandler {
   private body: HTMLElement;
   protected rawItems: Array<HTMLDivElement>;
-  
+
   protected exists: boolean;
 
   protected lastMenu!: Menu;
-  
+
   constructor(element: HTMLElement) {
     this.body = element;
     this.rawItems = new Array<HTMLDivElement>();
@@ -90,14 +90,14 @@ export class MenuHandler {
   }
   createPopup(type: "normal" | "mini", settings?: MenuSettings) {
     if (this.exists) {
-      const overlay = this.getRawPopup("overlay");
+      const overlay = this.getRawElement("overlay");
       const stts = !settings ? { close: true } : settings;
       if (overlay) {
         //if there's a overlay that does mean there is a menu as well
         this.lastMenu.close();
         const menu = new Menu(type, stts, this);
         this.lastMenu = menu;
-        this.getRawPopup("overlay")?.appendChild(menu.element);
+        this.getRawElement("overlay")?.appendChild(menu.element);
         return menu;
       } else {
         const menu = new Menu(type, stts, this);
@@ -106,7 +106,7 @@ export class MenuHandler {
         this.createRawElement("overlay").appendChild(menu.element);
         return menu;
       }
-    } else throw new EvalError("element does not exist")
+    } else throw new EvalError("element does not exist");
   }
   /**
    * Creates a raw element, at the body level.
@@ -121,7 +121,7 @@ export class MenuHandler {
       this.body.appendChild(popup);
       this.rawItems.push(popup);
       return popup;
-    } else throw new EvalError("element does not exist")
+    } else throw new EvalError("element does not exist");
   }
   /**
    * Closes a raw element, at the body level.
@@ -137,7 +137,7 @@ export class MenuHandler {
           this.rawItems.splice(ind, 1);
         }
       });
-    } else throw new EvalError("element does not exist")
+    } else throw new EvalError("element does not exist");
   }
   /**
    * Creates a new MenuHandler
@@ -146,8 +146,8 @@ export class MenuHandler {
    * @returns {[HTMLDivElement, MenuHandler]}
    */
   createMenuHandler(id: string): [HTMLDivElement, MenuHandler] {
-    const divReturned = this.createRawElement(id)
-    return [divReturned, new MenuHandler(divReturned)]
+    const divReturned = this.createRawElement(id);
+    return [divReturned, new MenuHandler(divReturned)];
   }
   /**
    * Removes THIS MenuHandler, and makes it unusable after
@@ -155,11 +155,11 @@ export class MenuHandler {
    * @returns {void}
    */
   deleteThisHandler(): void {
-    this.exists = false
+    this.exists = false;
     Object.freeze(this);
   }
 
-  protected getRawPopup(id: string): HTMLDivElement | undefined {
+  protected getRawElement(id: string): HTMLDivElement | undefined {
     for (const el of this.rawItems) {
       if (el.id == id) return el;
     }
@@ -167,7 +167,6 @@ export class MenuHandler {
 }
 
 export class SuperMenuHandler extends MenuHandler {
-
   constructor(element: HTMLElement) {
     super(element);
     this.notifications = new Array<Notification>();
@@ -175,22 +174,37 @@ export class SuperMenuHandler extends MenuHandler {
 
   protected notifications: Array<Notification>;
   protected notifShow: boolean | undefined;
+  protected notifTim: NodeJS.Timeout | undefined;
 
-  protected checkNotifications() {
-    //fix in case other notifs are being pushed so no duplicates
-    if (this.notifications.length == 0 || this.notifShow) return;
-    this.notifShow = true;
+  protected checkNotifications(killFirst: boolean) {
     //notif checker
     const check = () => {
       //* notif killer
       const killNotification = () => {
-        notif.style.right = "-12cm";
+        try {
+          notif.style.right = "-12cm";
+        } catch (e) {
+          //* If failure, get notif
+          this.getRawElement("notification")!.style.right = "-12cm";
+        }
         setTimeout(() => {
           this.closeRawElement("notification");
           if (this.notifications.length !== 0) check();
           else this.notifShow = false;
         }, 1000);
       };
+
+      //* Clean shown notification (if available) 
+      if (killFirst) {
+        try {
+          killNotification();
+          clearTimeout(this.notifTim);
+        } catch (e) {
+          console.error(`No available notification: ${e}`);     
+        }
+        return;
+      }
+
       const notifData = this.notifications.shift() as Notification;
       //* html notif
       const notif = this.createRawElement("notification");
@@ -212,7 +226,9 @@ export class SuperMenuHandler extends MenuHandler {
         : (notifTitle.style.color = "white");
       //* Text
       const notifText = document.createElement("p");
-      notifText.textContent = notifData.text;
+      // notifText.textContent = notifData.text;
+      //! temporal method, this may lead to an attack
+      notifText.innerHTML = `<p>${notifData.text}</p>`;
       notifText.className = "fpfont notif";
       //* appends
       notif.append(notifButton, notifTitle, notifText);
@@ -221,8 +237,16 @@ export class SuperMenuHandler extends MenuHandler {
         notif.style.right = "10px";
       }, 100);
       //* timeout for killing notif
-      setTimeout(killNotification, notifData.duration * 1000);
+      this.notifTim = setTimeout(killNotification, notifData.duration * 1000);
     };
+
+    //fix in case other notifs are being pushed so no duplicates
+    if (killFirst) check();
+    else if (this.notifications.length == 0 || this.notifShow) return;
+    
+    
+    this.notifShow = true;
+
     //start checking notifications
     check();
   }
@@ -239,10 +263,15 @@ export class SuperMenuHandler extends MenuHandler {
     duration: number
   ) {
     this.notifications.push({ title, titleType, text, duration });
-    this.checkNotifications();
+    this.checkNotifications(false);
+  }
+  /**
+   * Clears the notification that was on the UI
+   */
+  clearShownNotification() {
+    this.checkNotifications(true);
   }
 }
-
 
 interface MenuSettings {
   close: boolean;
